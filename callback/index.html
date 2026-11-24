@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TikTok connection</title><style>body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:720px;margin:0 auto;padding:24px 16px 60px;line-height:1.55;color:#1b1b1f;background:#fff}
+h1{font-size:1.6rem}h2{font-size:1.15rem;margin-top:1.8rem}a{color:#c2185b}nav a{margin-right:14px}
+code,pre{background:#f3f3f5;border-radius:6px;padding:2px 6px;word-break:break-all}
+.box{background:#f3f3f5;border-radius:10px;padding:14px;word-break:break-all}
+button{font-size:1.05rem;padding:12px 18px;border:0;border-radius:10px;background:#fe2c55;color:#fff;font-weight:700;margin-top:12px}</style></head><body>
+<nav><a href="../">Home</a><a href="../terms.html">Terms of Service</a><a href="../privacy.html">Privacy Policy</a></nav>
+
+<h1>Almost done</h1>
+<p>Copy the full address below, then paste it into the GitHub workflow <strong>"Connect TikTok"</strong>
+(step <code>finish</code>). It is valid for only a few minutes.</p>
+<div class="box" id="url">...</div>
+<button id="copy">Copy address</button> <span id="ok"></span>
+<p style="color:#666;font-size:.9rem">This page does not send the address anywhere; it only shows it in your browser.</p>
+<script>
+var u=location.href;document.getElementById('url').textContent=u;
+document.getElementById('copy').onclick=function(){
+  (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){document.getElementById('ok').textContent='Copied';},
+  function(){var r=document.createRange();r.selectNodeContents(document.getElementById('url'));var s=getSelection();s.removeAllRanges();s.addRange(r);
+  document.getElementById('ok').textContent='Selected - tap Copy in the menu';});};
+</script></body></html>
