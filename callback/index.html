@@ -10,11 +10,18 @@ button{font-size:1.05rem;padding:12px 18px;border:0;border-radius:10px;backgroun
 <h1>Almost done</h1>
 <p>Copy the full address below, then paste it into the GitHub workflow <strong>"Connect TikTok"</strong>
 (step <code>finish</code>). It is valid for only a few minutes.</p>
+<div id="state-note" class="small"></div>
 <div class="box" id="url">...</div>
 <button id="copy">Copy address</button> <span id="ok"></span>
 <p style="color:#666;font-size:.9rem">This page does not send the address anywhere; it only shows it in your browser.</p>
 <script>
 var u=location.href;document.getElementById('url').textContent=u;
+(function(){var q=new URLSearchParams(location.search),n=document.getElementById('state-note'),s=null;
+ try{s=sessionStorage.getItem('tiktok_state');}catch(e){}
+ if(q.get('error')){n.textContent='TikTok reported: '+q.get('error')+' '+(q.get('error_description')||'');}
+ else if(!q.get('code')){n.textContent='No sign-in code in this address. Start again from the home page.';}
+ else if(s&&q.get('state')&&q.get('state')!==s){n.textContent='Warning: the security value does not match this browser session. Start again from the home page.';}
+ else{n.textContent='Signed in with TikTok. Permissions granted: '+(q.get('scopes')||'user.info.basic, video.upload')+'.';}})();
 document.getElementById('copy').onclick=function(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){document.getElementById('ok').textContent='Copied';},
   function(){var r=document.createRange();r.selectNodeContents(document.getElementById('url'));var s=getSelection();s.removeAllRanges();s.addRange(r);

@@ -4,14 +4,52 @@
 h1{font-size:1.6rem}h2{font-size:1.15rem;margin-top:1.8rem}a{color:#c2185b}nav a{margin-right:14px}
 code,pre{background:#f3f3f5;border-radius:6px;padding:2px 6px;word-break:break-all}
 .box{background:#f3f3f5;border-radius:10px;padding:14px;word-break:break-all}
-button{font-size:1.05rem;padding:12px 18px;border:0;border-radius:10px;background:#fe2c55;color:#fff;font-weight:700;margin-top:12px}</style></head><body>
+button{font-size:1.05rem;padding:12px 18px;border:0;border-radius:10px;background:#fe2c55;color:#fff;font-weight:700;margin-top:12px}.connect{background:#f3f3f5;border-radius:12px;padding:16px;margin:22px 0}
+.connect button{margin-top:6px}.small{color:#666;font-size:.9rem}#msg{margin-top:10px;color:#b00020}
+ol li{margin:4px 0}</style></head><body>
 <nav><a href="./">Home</a><a href="./terms.html">Terms of Service</a><a href="./privacy.html">Privacy Policy</a></nav>
 
 <h1>Ranking Shorts Uploader</h1>
-<p>Ranking Shorts Uploader is a small personal tool. It creates short explainer videos and posts them to the
-operator's <strong>own</strong> TikTok and YouTube accounts. It is not a public service: only the operator's own
-account is connected, and no other users can sign up.</p>
-<p>The tool uses the TikTok Login Kit and the Content Posting API (upload as draft) to send a finished video to the
-operator's TikTok inbox, where it is reviewed and published manually inside the TikTok app.</p>
+<p>Ranking Shorts Uploader is a small personal tool. It creates short explainer videos and sends them to the
+operator's <strong>own</strong> TikTok account as <strong>drafts</strong>. The operator reviews each draft and
+publishes it manually inside the TikTok app. It is not a public service: only the operator's own account is
+connected, and no other users can sign up.</p>
+
+<h2>How it works</h2>
+<ol>
+<li>The operator signs in once with TikTok (<strong>Login Kit</strong>, scope <code>user.info.basic</code>) using the button below.</li>
+<li>TikTok shows its consent screen. After approval, TikTok sends the operator back to this site
+(<code>/callback/</code>), which displays the sign-in address so the operator can finish the connection.</li>
+<li>When a new video is ready, the tool uploads it to the operator's TikTok inbox as a draft
+(<strong>Content Posting API</strong>, scope <code>video.upload</code>).</li>
+<li>The operator opens the draft in the TikTok app, adds the description and the AI-generated content label,
+and publishes it.</li>
+</ol>
+
+<div class="connect">
+<strong>Operator sign-in</strong>
+<p class="small" style="margin:6px 0">Requested permissions: <code>user.info.basic</code> and <code>video.upload</code>.
+Nothing is posted without the operator's manual review in the TikTok app.</p>
+<button id="connect" type="button">Connect with TikTok</button>
+<div id="msg"></div>
+</div>
+
 <ul><li><a href="terms.html">Terms of Service</a></li><li><a href="privacy.html">Privacy Policy</a></li></ul>
-<p>Operator: <a href="https://github.com/LeonHois">github.com/LeonHois</a></p></body></html>
+<p>Operator: <a href="https://github.com/LeonHois">github.com/LeonHois</a></p>
+<script src="config.js"></script>
+<script>
+(function () {
+  var REDIRECT = location.origin + location.pathname.replace(/[^\/]*$/, "") + "callback/";
+  var btn = document.getElementById("connect"), msg = document.getElementById("msg");
+  var key = (window.TIKTOK_CLIENT_KEY || "").trim();
+  if (!key) { btn.disabled = true; msg.textContent = "Sign-in is not configured yet (client key missing)."; return; }
+  btn.onclick = function () {
+    var arr = new Uint8Array(12); (window.crypto || window.msCrypto).getRandomValues(arr);
+    var state = Array.prototype.map.call(arr, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+    try { sessionStorage.setItem("tiktok_state", state); } catch (e) {}
+    var q = new URLSearchParams({ client_key: key, scope: "user.info.basic,video.upload", response_type: "code",
+                                  redirect_uri: REDIRECT, state: state });
+    location.href = "https://www.tiktok.com/v2/auth/authorize/?" + q.toString();
+  };
+})();
+</script></body></html>
