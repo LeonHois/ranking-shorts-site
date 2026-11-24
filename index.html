@@ -36,20 +36,30 @@ Nothing is posted without the operator's manual review in the TikTok app.</p>
 
 <ul><li><a href="terms.html">Terms of Service</a></li><li><a href="privacy.html">Privacy Policy</a></li></ul>
 <p>Operator: <a href="https://github.com/LeonHois">github.com/LeonHois</a></p>
-<script src="config.js"></script>
 <script>
 (function () {
   var REDIRECT = location.origin + location.pathname.replace(/[^\/]*$/, "") + "callback/";
   var btn = document.getElementById("connect"), msg = document.getElementById("msg");
-  var key = (window.TIKTOK_CLIENT_KEY || "").trim();
-  if (!key) { btn.disabled = true; msg.textContent = "Sign-in is not configured yet (client key missing)."; return; }
-  btn.onclick = function () {
-    var arr = new Uint8Array(12); (window.crypto || window.msCrypto).getRandomValues(arr);
-    var state = Array.prototype.map.call(arr, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
-    try { sessionStorage.setItem("tiktok_state", state); } catch (e) {}
-    var q = new URLSearchParams({ client_key: key, scope: "user.info.basic,video.upload", response_type: "code",
-                                  redirect_uri: REDIRECT, state: state });
-    location.href = "https://www.tiktok.com/v2/auth/authorize/?" + q.toString();
-  };
+  function fail(t) { btn.disabled = true; msg.textContent = t; }
+  function ready() {
+    var key = (window.TIKTOK_CLIENT_KEY || "").trim();
+    if (!key) { fail("Sign-in is not configured yet (client key missing in config.js)."); return; }
+    btn.disabled = false; msg.textContent = "";
+    btn.onclick = function () {
+      var arr = new Uint8Array(12); (window.crypto || window.msCrypto).getRandomValues(arr);
+      var state = Array.prototype.map.call(arr, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+      try { sessionStorage.setItem("tiktok_state", state); } catch (e) {}
+      var q = new URLSearchParams({ client_key: key, scope: "user.info.basic,video.upload", response_type: "code",
+                                    redirect_uri: REDIRECT, state: state });
+      location.href = "https://www.tiktok.com/v2/auth/authorize/?" + q.toString();
+    };
+  }
+  btn.disabled = true; msg.textContent = "Loading sign-in settings ...";
+  // config.js jedes Mal frisch laden: GitHub Pages lässt den Browser Dateien ~10 Minuten zwischenspeichern
+  var sc = document.createElement("script");
+  sc.src = "config.js?t=" + Date.now();
+  sc.onload = ready;
+  sc.onerror = function () { fail("Sign-in settings (config.js) could not be loaded. Reload the page."); };
+  document.head.appendChild(sc);
 })();
 </script></body></html>
